@@ -73,6 +73,7 @@ class NewPost(webapp2.RequestHandler):
 
             b = Blog(title = title, entry = entry)
             b.put()
+
             self.redirect("/")
 
         else:
@@ -84,11 +85,30 @@ class NewPost(webapp2.RequestHandler):
             self.response.write(response)
 
 
+class ViewPostHandler(webapp2.RequestHandler):
+    def get(self, id):
+        a = int(id)
 
+        display = Blog.get_by_id(a)
+
+        if not display:
+            error = "That post does not exist."
+
+            t= jinja_env.get_template("most_recent.html")
+            response = t.render(error = error)
+            self.response.write(response)
+
+        else:
+
+            t= jinja_env.get_template("single_post.html")
+            response = t.render(display = display)
+            self.response.write(response)
 
 
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/newpost', NewPost)
+    ('/blog', MainHandler),
+    ('/newpost', NewPost),
+    webapp2.Route('/blog/<id:\d+>', ViewPostHandler)
 ], debug=True)
