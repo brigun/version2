@@ -40,9 +40,26 @@ class MainHandler(webapp2.RequestHandler):
 
         blogs = db.GqlQuery("SELECT * FROM Blog ORDER BY created DESC LIMIT 5")
 
-        t = jinja_env.get_template("add_form.html")
+        t = jinja_env.get_template("most_recent.html")
         response = t.render(
                         blogs = blogs,
+                        error = error)
+        self.response.write(response)
+
+
+
+class NewPost(webapp2.RequestHandler):
+
+    def get(self):
+
+        error = self.request.get("error")
+        title = self.request.get("title")
+        entry = self.request.get("entry")
+
+        t = jinja_env.get_template("add_form.html")
+        response = t.render(
+                        title = title,
+                        entry = entry,
                         error = error)
         self.response.write(response)
 
@@ -62,10 +79,16 @@ class MainHandler(webapp2.RequestHandler):
 
             error = "We need both a title and an entry to create a new blog post."
 
-            self.redirect("/?error=" + error)
+            t=jinja_env.get_template("add_form.html")
+            response = t.render(title = title, entry = entry, error = error)
+            self.response.write(response)
+
+
+
 
 
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/newpost', NewPost)
 ], debug=True)
