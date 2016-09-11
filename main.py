@@ -38,7 +38,7 @@ class MainHandler(webapp2.RequestHandler):
         title = self.request.get("title")
         entry = self.request.get("entry")
 
-        blogs = db.GqlQuery("SELECT * FROM Blog ORDER BY created LIMIT 5")
+        blogs = db.GqlQuery("SELECT * FROM Blog ORDER BY created DESC LIMIT 5")
 
         t = jinja_env.get_template("add_form.html")
         response = t.render(
