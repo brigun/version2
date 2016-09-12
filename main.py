@@ -25,6 +25,13 @@ from google.appengine.ext import db
 template_dir = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape = True)
 
+
+#def get_posts(limit = 0, offset = 0):
+    #qry = "SELECT * FROM Blog ORDER BY created DESC LIMIT %s OFFSET %s" % (limit, offset).
+
+    #r = db.GqlQuery(qry)
+    #return r
+
 class Blog(db.Model):
     title = db.StringProperty(required=True)
     entry = db.TextProperty(required=True)
@@ -37,8 +44,14 @@ class MainHandler(webapp2.RequestHandler):
         error = self.request.get("error")
         title = self.request.get("title")
         entry = self.request.get("entry")
+        page = self.request.get("page")
+
+        posts_per_page = 5
+        off = posts_per_page * page
+
 
         blogs = db.GqlQuery("SELECT * FROM Blog ORDER BY created DESC LIMIT 5")
+        #blogs = get_posts(posts_per_page, off)
 
         t = jinja_env.get_template("most_recent.html")
         response = t.render(
@@ -73,8 +86,9 @@ class NewPost(webapp2.RequestHandler):
 
             b = Blog(title = title, entry = entry)
             b.put()
+            c = str(b.key().id())
 
-            self.redirect("/")
+            self.redirect("/blog/" + c )
 
         else:
 
